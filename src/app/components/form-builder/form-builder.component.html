@@ -1,0 +1,84 @@
+<button class="btn btn-primary" (click)="open(content)" *ngIf="!formDataList.length">Add Question</button>
+<ng-template #content let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-title">Add a New Question</h4>
+        <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="builderForm">
+            <ol>
+                <li>
+                    <div class="row">
+                        <div *ngFor="let option of questionTypes;" class="col-12 col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" [value]="option"
+                                    [id]="option" formControlName="questionType" (change)="addCheckboxOptionsField()">
+                                <label class="form-check-label" [for]="option">
+                                    {{option}}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="mt-3">
+                        <label for="question" class="form-label">Type question here</label>
+                        <input type="text" class="form-control" id="question" 
+                            placeholder="Ex: What is your name?" formControlName="question">
+                    </div>
+                </li>
+
+                <li *ngIf="builderForm.controls['questionType'].value === 'Checkbox'">
+                    <div class="mt-3">
+                        <div formGroupName="checkboxOptions">
+                            <div class="d-flex" *ngFor="let elem of checkboxOptions.controls; let index = index">
+                                <input type="text" placeholder="Add answer option"
+                                class="form-control mb-2 w-75" [formControlName]="index">
+                                <i class="bi bi-trash3" (click)="removeCheckboxOption(index)"></i>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-sm btn-outline-primary mt-1" (click)="addCheckboxOption()">
+                            Add another answer
+                        </button>
+                    </div>
+                </li>
+            </ol>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-success" [disabled]="builderForm.invalid" (click)="submit()">Submit</button>
+    </div>
+</ng-template>
+
+<div class="d-flex justify-content-center" *ngIf="formDataList.length">
+    <div class="w-50 shadow bg-body rounded p-3">
+        <form [formGroup]="form">
+            <div *ngFor="let data of formDataList; let i = index;" class="mb-3">
+                <label class="mb-2"> <b> {{i+1}}. {{data.question}}* </b> </label>
+
+                <textarea *ngIf="data.questionType === 'Textbox'" [formControlName]="preProcessControlName(data.question, i)" 
+                    class="form-control" id="textarea-field" rows="3">
+                </textarea>
+
+                <ng-container *ngIf="data.questionType === 'Checkbox'">
+                    <div *ngFor="let answer of data.checkboxOptions; let j = index;" 
+                        [formArrayName]="preProcessControlName(data.question, i)" class="form-check">
+                        <input class="form-check-input" type="checkbox" [formControlName]="j" 
+                            [id]="preProcessControlName(data.question, i) + '-' + j">
+                        <label class="form-check-label" [for]="preProcessControlName(data.question, i) + '-' + j">
+                            {{answer.value}}
+                        </label>
+                    </div>
+                </ng-container>
+            </div>
+
+        </form>
+        <div class="d-flex mt-5">
+            <button class="btn btn-primary" (click)="open(content)">Add New Question</button>
+            <button class="btn btn-success ms-auto" (click)="reviewAnswers()">Review my answers</button>
+        </div>
+    </div>
+</div>
+

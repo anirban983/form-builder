@@ -1,9 +1,12 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { HeaderModule } from './components/header/header.module';
+import { FormBuilderModule } from './components/form-builder/form-builder.module';
+import { FormService } from './services/form.service';
+import { ReviewAnswersModule } from './components/review-answers/review-answers.module';
 
 @NgModule({
   declarations: [
@@ -12,9 +15,14 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    NgbModule
+    NgbModule,
+    HeaderModule,
+    FormBuilderModule,
+    ReviewAnswersModule
   ],
-  providers: [],
+  providers: [
+    FormService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
