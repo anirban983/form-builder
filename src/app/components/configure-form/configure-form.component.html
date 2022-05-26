@@ -1,5 +1,5 @@
-<button class="btn btn-primary" (click)="open(content)" *ngIf="!formDataList.length">Add Question</button>
-<ng-template #content let-modal>
+<button class="btn btn-primary" (click)="open()" *ngIf="!formDataList.length">Add Question</button>
+<ng-template #modal let-modal>
     <div class="modal-header">
         <h4 class="modal-title" id="modal-title">Add a New Question</h4>
         <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
@@ -53,32 +53,12 @@
 </ng-template>
 
 <div class="d-flex justify-content-center" *ngIf="formDataList.length">
-    <div class="w-50 shadow bg-body rounded p-3">
-        <form [formGroup]="form">
-            <div *ngFor="let data of formDataList; let i = index;" class="mb-3">
-                <label class="mb-2"> <b> {{i+1}}. {{data.question}}* </b> </label>
-
-                <textarea *ngIf="data.questionType === 'Textbox'" [formControlName]="preProcessControlName(data.question, i)" 
-                    class="form-control" id="textarea-field" rows="3">
-                </textarea>
-
-                <ng-container *ngIf="data.questionType === 'Checkbox'">
-                    <div *ngFor="let answer of data.checkboxOptions; let j = index;" 
-                        [formArrayName]="preProcessControlName(data.question, i)" class="form-check">
-                        <input class="form-check-input" type="checkbox" [formControlName]="j" 
-                            [id]="preProcessControlName(data.question, i) + '-' + j">
-                        <label class="form-check-label" [for]="preProcessControlName(data.question, i) + '-' + j">
-                            {{answer.value}}
-                        </label>
-                    </div>
-                </ng-container>
-            </div>
-
-        </form>
-        <div class="d-flex mt-5">
-            <button class="btn btn-primary" (click)="open(content)">Add New Question</button>
-            <button class="btn btn-success ms-auto" (click)="reviewAnswers()">Review my answers</button>
-        </div>
+    <div class="w-50">
+        <app-form-viewer 
+            [form]="form" 
+            [formDataList]="formDataList" 
+            (openConfigureFormModalEvent)="open()"
+            (reviewAnswersEvent)="reviewAnswers($event)"
+        ></app-form-viewer>
     </div>
 </div>
-

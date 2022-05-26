@@ -1,23 +1,21 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilderComponent } from './form-builder.component';
+import { FormViewerComponent } from './form-viewer.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
 
 
 
 @NgModule({
   declarations: [
-    FormBuilderComponent
+    FormViewerComponent
   ],
   imports: [
     CommonModule,
     FormsModule,
-    ReactiveFormsModule,
-    RouterModule
+    ReactiveFormsModule
   ],
   exports: [
-    FormBuilderComponent
+    FormViewerComponent
   ]
 })
-export class FormBuilderModule { }
+export class FormViewerModule { }

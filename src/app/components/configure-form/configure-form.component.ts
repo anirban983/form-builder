@@ -1,25 +1,23 @@
-import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ICustomFormControl } from 'src/app/interfaces/custom.form.control.model';
 import { FormService } from 'src/app/services/form.service';
 
-interface CustomFormControl {
-  questionType: 'Textbox' | 'Checkbox'
-  question: string
-  checkboxOptions: any[]
-}
-
 @Component({
-  selector: 'app-form-builder',
-  templateUrl: './form-builder.component.html',
-  styleUrls: ['./form-builder.component.scss']
+  selector: 'app-configure-form',
+  templateUrl: './configure-form.component.html',
+  styleUrls: ['./configure-form.component.scss']
 })
-export class FormBuilderComponent implements OnInit {
-  questionTypes = ['Textbox', 'Checkbox']
-  form: FormGroup = new FormGroup({})
-  builderForm = new FormGroup({})
-  formDataList: CustomFormControl[] = []
+export class ConfigureFormComponent implements OnInit {
 
+  @ViewChild('modal')
+  modal!: ElementRef;
+  formDataList: ICustomFormControl[] = []
+  builderForm = new FormGroup({})
+  form = new FormGroup({})
+  questionTypes = ['Textbox', 'Checkbox']
+  
   constructor(
     private modalService: NgbModal,
     private formBuilder: FormBuilder,
@@ -30,21 +28,11 @@ export class FormBuilderComponent implements OnInit {
     this.initializeBuilderForm()
   }
 
-  open(content: any) {
-    this.modalService.open(content, { 
+  open() {
+    this.modalService.open(this.modal, { 
       ariaLabelledBy: 'modal-basic-title',
       size: 'lg'
     })
-  }
-
-  addCheckboxOption() {
-    const checkboxOptions = this.builderForm.get('checkboxOptions') as FormArray
-    checkboxOptions.push(this.formBuilder.control(null, Validators.required))
-  }
-
-  removeCheckboxOption(index: number) {
-    const checkboxOptions = this.builderForm.get('checkboxOptions') as FormArray
-    checkboxOptions.removeAt(index)
   }
 
   initializeBuilderForm() {
@@ -58,7 +46,7 @@ export class FormBuilderComponent implements OnInit {
 
   addCheckboxOptionsField() {
     if (this.builderForm.controls['questionType']?.value === 'Checkbox') {
-      this.builderForm.addControl('checkboxOptions', new FormArray([
+      this.builderForm.addControl('checkboxOptions', this.formBuilder.array([
         this.formBuilder.control(null, Validators.required)
       ]))
     } else {
@@ -68,24 +56,34 @@ export class FormBuilderComponent implements OnInit {
     }
   }
 
+  get checkboxOptions() { 
+    return this.builderForm.get('checkboxOptions') as FormArray 
+  }
+
+  removeCheckboxOption(index: number) {
+    const checkboxOptions = this.builderForm.get('checkboxOptions') as FormArray
+    checkboxOptions.removeAt(index)
+  }
+
+  addCheckboxOption() {
+    const checkboxOptions = this.builderForm.get('checkboxOptions') as FormArray
+    checkboxOptions.push(this.formBuilder.control(null, Validators.required))
+  }
+
   submit() {
     this.buildForm(this.builderForm.value)
     this.initializeBuilderForm()
     this.modalService.dismissAll()
   }
 
-  get checkboxOptions() { 
-    return this.builderForm.get('checkboxOptions') as FormArray 
-  }
-
-  buildForm(formData: CustomFormControl) {
+  buildForm(formData: ICustomFormControl) {
     if (formData['questionType'] === 'Textbox') {
       this.form.addControl(
         this.preProcessControlName(formData['question'], this.formDataList.length), 
         this.formBuilder.control(null, Validators.required)
       )
     } else if (formData['questionType'] === 'Checkbox') {
-      formData.checkboxOptions = formData.checkboxOptions.map(value => { return { selected: false, value } })
+      formData.checkboxOptions = formData.checkboxOptions.map((value: string) => { return { selected: false, value } })
       this.form.addControl(
         this.preProcessControlName(formData['question'], this.formDataList.length), 
         this.buildCheckboxControls(formData.checkboxOptions)
@@ -105,17 +103,17 @@ export class FormBuilderComponent implements OnInit {
     return (key.replace(/[^a-zA-Z0-9]/g, "") + '-' +index).toLowerCase()
   }
 
-  reviewAnswers() {
+  reviewAnswers(submittedFormData: any) {
     const result: any[] = []
     let i = 0
     for (const data of this.formDataList) {
       let answer
       const controlName = this.preProcessControlName(data.question, i)
       if (data.questionType === 'Checkbox') {
-        const submittedData = this.form.value[controlName]
+        const submittedData = submittedFormData[controlName]
         answer = data.checkboxOptions.filter((value, index) => submittedData[index]).map(element => element.value)
       } else {
-        answer = this.form.value[controlName]
+        answer = submittedFormData[controlName]
       }
       result.push({
         question: data.question,

@@ -4,9 +4,9 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { HeaderModule } from './components/header/header.module';
-import { FormBuilderModule } from './components/form-builder/form-builder.module';
 import { FormService } from './services/form.service';
 import { ReviewAnswersModule } from './components/review-answers/review-answers.module';
+import { ConfigureFormModule } from './components/configure-form/configure-form.module';
 
 @NgModule({
   declarations: [
@@ -17,8 +17,8 @@ import { ReviewAnswersModule } from './components/review-answers/review-answers.
     AppRoutingModule,
     NgbModule,
     HeaderModule,
-    FormBuilderModule,
-    ReviewAnswersModule
+    ReviewAnswersModule,
+    ConfigureFormModule
   ],
   providers: [
     FormService
