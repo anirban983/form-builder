@@ -78,6 +78,10 @@ export class ConfigureFormComponent implements OnInit {
    */
   removeCheckboxOption(index: number) {
     const checkboxOptions = this.builderForm.get('checkboxOptions') as FormArray
+    if (checkboxOptions.length === 1) {
+      window.alert('Must have minimum 1 answer option')
+      return
+    }
     checkboxOptions.removeAt(index)
   }
 
@@ -110,6 +114,7 @@ export class ConfigureFormComponent implements OnInit {
       )
     } else if (formData['questionType'] === 'Checkbox') {
       formData.checkboxOptions = formData.checkboxOptions.map((value: string) => { return { selected: false, value } })
+      formData.checkboxOptions.push({ selected: false, value: 'Other' })
       this.form.addControl(
         this.preProcessControlName(formData['question'], this.formDataList.length), 
         this.buildCheckboxControls(formData.checkboxOptions)
